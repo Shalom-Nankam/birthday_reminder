@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Homepage</title>
+    <style>
+      *,
+      ::before {
+        margin: 0;
+        padding: 0;
+      }
+      .wrapper {
+        width: 100vw;
+        height: 100vh;
+        padding-top: 2%;
+      }
+      h1 {
+        text-align: center;
+        font-size: 70px;
+      }
+      .details-form {
+        display: flex;
+        height: 50%;
+        width: 90%;
+        align-items: start;
+        justify-content: center;
+        margin-top: 2%;
+        padding: 2%;
+      }
+
+      input {
+        height: 30px;
+        width: 300px;
+        margin-top: 10px;
+        margin-bottom: 30px;
+        padding: 2%;
+      }
+      button {
+        height: 35px;
+        width: 320px;
+        border-width: 0.5px;
+        border-radius: 10px;
+      }
+      button:hover {
+        background-color: black;
+        color: white;
+      }
+      ::backdrop {
+        background-color: gray;
+        opacity: 0.8;
+      }
+      h2 {
+        margin-block: 20px;
+      }
+      p {
+        margin-block: 5px;
+      }
+      #dismiss-btn {
+        margin-block: 20px;
+        margin-inline: 20px;
+      }
+      dialog {
+        padding: 30px;
+      }
+      .birthday-list {
+        /* height: 50%; */
+        width: 90%;
+      }
+      .b-list {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        margin-block: 2%;
+        margin-inline: 30%;
+        box-shadow: 2px 2px 30px 4px gray;
+        row-gap: 10px;
+      }
+      p {
+        margin-inline: 2%;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrapper">
+      <h1>Birthday Reminder App</h1>
+      <div class="details-form">
+        <form action="/" method="post" id="birthdayForm">
+          <label for="username">Username:</label><br />
+          <input
+            type="text"
+            name="username"
+            id="username"
+            autocomplete="off"
+          /><br />
+          <label for="email">Email:</label><br />
+          <input type="text" name="email" id="email" autocomplete="off" /><br />
+          <label for="dob">Date of birth:</label><br />
+          <input type="date" name="dob" id="dob" autocomplete="off" /><br />
+          <button type="button" id="save-btn">Save details</button>
+        </form>
+      </div>
+      <div class="birthday-list"></div>
+      <dialog id="info-dialog">
+        <h2>Congratulations</h2>
+        <p>Your birthday has been recorded</p>
+        <button type="button" id="dismiss">Done</button>
+      </dialog>
+    </div>
+  </body>
+  <script>
+    const saveBtn = document.getElementById("save-btn");
+    const dismissBtn = document.getElementById("dismiss");
+    const infoDialog = document.getElementById("info-dialog");
+
+    saveBtn.addEventListener("click", async function () {
+      const username = document.getElementById("username").value;
+      const email = document.getElementById("email").value;
+      const dob = document.getElementById("dob").value;
+
+      const response = await fetch("/", {
+        method: "POST",
+        body: JSON.stringify({
+          username,
+          email,
+          dob,
+        }),
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      const finalResponse = await response.json();
+      const success = finalResponse.success;
+
+      if (success) {
+        const formToReset = document.getElementById("birthdayForm");
+        formToReset.reset();
+        var header = document.querySelector("h2");
+        header.innerText = `Congratulations ${name}!`;
+        const birthdayResponse = finalResponse.message;
+        const birthdays = document.querySelector(".birthday-list");
+        const newList = document.createElement("div");
+        newList.innerHTML = `<div class="birthday-list">
+                        <div class="b-list">
+                        <p>${birthdayResponse.username} </p>
+                         <p>${birthdayResponse.email}</p>
+                        <p>${birthdayResponse.dob}</p>
+                          </div>`;
+        birthdays.appendChild(newList);
+        infoDialog.showModal();
+      } else {
+        alert(finalResponse.message);
+      }
+    });
+
+    dismissBtn.addEventListener("click", function () {
+      infoDialog.close();
+    });
+  </script>
+</html>
