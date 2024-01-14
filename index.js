@@ -13,7 +13,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/", birthdayRouter);
 
-// job.start();
+job.start();
 db.connect();
 app.listen(4005, () => {
   console.log("===========> server now listening");
